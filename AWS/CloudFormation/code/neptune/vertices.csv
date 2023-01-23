@@ -1,0 +1,10 @@
+~id, ~label, name:String
+riyaz, person, Riyaz
+stephane, person, Stephane
+mark, person, Mark
+ram, person, Ram
+tracy, person, Tracy
+coffee, food, Coffee
+tea, food, Tea
+cookies, food, Cookies
+pizza, food, Pizza

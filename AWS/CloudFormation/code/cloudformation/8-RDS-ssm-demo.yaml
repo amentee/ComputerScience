@@ -1,0 +1,24 @@
+
+Parameters: 
+  # will fetch the latest version every time
+  InstanceClass:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /MyDB/InstanceClass
+
+Resources:
+  MyDB:
+    Type: 'AWS::RDS::DBInstance'
+    Properties:
+      DBInstanceClass: !Ref InstanceClass
+      AllocatedStorage: 20
+      Engine: MySQL
+      EngineVersion: 8.0.16
+      # ssm dynamic is supported for most properties
+      # you must specify a version
+      MasterUsername: '{{resolve:ssm:/MyDB/RDSUser:1}}'
+      # ssm-secure only supports MasterUserPassword
+      # you must specify a version
+      MasterUserPassword: '{{resolve:ssm-secure:/MyDB/RDSUserPassword:1}}'
+      DeletionProtection: false
+      DeleteAutomatedBackups: true
+    DeletionPolicy: Delete

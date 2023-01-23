@@ -1,0 +1,22 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  SnapshotID:
+    Type: String 
+Resources:
+  MyDB:
+    Type: 'AWS::RDS::DBInstance'
+    Properties:
+      DBInstanceClass: "db.t2.micro"
+      AllocatedStorage: 20
+      Engine: MySQL
+      EngineVersion: 8.0.16
+      DeletionProtection: false
+      DeleteAutomatedBackups: true
+      # we change the port which will trigger a replacement
+      Port: 3307
+      # we restore from a snapshot ID
+      DBSnapshotIdentifier: !Ref SnapshotID
+      # Master Username and Master Password aren't valid anymore
+      # MasterUsername: !Ref DBUsername
+      # MasterUserPassword: !Ref DBPassword
+

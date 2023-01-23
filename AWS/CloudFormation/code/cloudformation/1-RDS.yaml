@@ -1,0 +1,13 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  MyDB:
+    Type: 'AWS::RDS::DBInstance'
+    Properties:
+      DBInstanceClass: "db.t2.micro"
+      AllocatedStorage: 20
+      Engine: MySQL
+      EngineVersion: 8.0.16
+      MasterUsername: admin
+      MasterUserPassword: secretpassword
+      DeletionProtection: false
+      DeleteAutomatedBackups: true

@@ -1,0 +1,89 @@
+--- 
+Parameters:
+  DBUsername:
+      NoEcho: 'true'
+      Description: Username for MySQL database access
+      Type: String
+      MinLength: '1'
+      MaxLength: '16'
+      AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
+      ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+  DBPassword:
+    NoEcho: 'true'
+    Description: Password MySQL database access
+    Type: String
+    MinLength: '8'
+    MaxLength: '41'
+    AllowedPattern: '[a-zA-Z0-9]*'
+    ConstraintDescription: must contain only alphanumeric characters.
+  Subnet1: 
+    Description: Subnet 1 ID
+    Type: 'AWS::EC2::Subnet::Id'
+  Subnet1AZ:
+    Type: 'AWS::EC2::AvailabilityZone::Name'
+  Subnet2: 
+    Description: Subnet 1 ID
+    Type: 'AWS::EC2::Subnet::Id'
+  Subnet2AZ:
+    Type: 'AWS::EC2::AvailabilityZone::Name'
+  
+
+Resources:
+  DBSubnetGroup:
+    Type: 'AWS::RDS::DBSubnetGroup'
+    Properties:
+      DBSubnetGroupDescription: !Ref 'AWS::StackName'
+      SubnetIds: 
+        - !Ref Subnet1
+        - !Ref Subnet2
+
+  RDSDBClusterParameterGroup: 
+    Type: 'AWS::RDS::DBClusterParameterGroup'
+    Properties: 
+      Description: "CloudFormation Sample Aurora Cluster Parameter Group"
+      Family: aurora5.6
+      Parameters: 
+        time_zone: US/Eastern
+    
+  # master username and password are defined here
+  RDSCluster: 
+    Type: 'AWS::RDS::DBCluster'
+    Properties: 
+      DBClusterParameterGroupName: !Ref RDSDBClusterParameterGroup
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      Engine: aurora
+      MasterUserPassword: !Ref DBPassword
+      MasterUsername: !Ref DBUsername
+
+  RDSDBParameterGroup: 
+    Type: 'AWS::RDS::DBParameterGroup'
+    Properties: 
+      Description: "CloudFormation Sample Aurora Parameter Group"
+      Family: aurora5.6
+      Parameters: 
+        sql_mode: IGNORE_SPACE
+    
+
+  RDSDBInstance1: 
+    Type: 'AWS::RDS::DBInstance'
+    Properties: 
+      AvailabilityZone: !Ref Subnet1AZ
+      # this belongs to this cluster
+      DBClusterIdentifier: !Ref RDSCluster
+      DBInstanceClass: db.t2.small
+      DBParameterGroupName: !Ref RDSDBParameterGroup
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      Engine: aurora
+      PubliclyAccessible: true
+    
+  RDSDBInstance2: 
+    Type: 'AWS::RDS::DBInstance'
+    Properties: 
+      AvailabilityZone: !Ref Subnet2AZ
+      # this belongs to this cluster
+      DBClusterIdentifier: !Ref RDSCluster
+      DBInstanceClass: db.t2.small
+      DBParameterGroupName: !Ref RDSDBParameterGroup
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      Engine: aurora
+      PubliclyAccessible: true

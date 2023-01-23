@@ -1,0 +1,50 @@
+//Switch to gremlin directory
+ls
+cd apache-tinkerpop-gremlin-console-3.4.1/
+
+//Run gremlin shell
+bin/gremlin.sh
+
+//Connect to remote Neptune cluster
+:remote connect tinkerpop.server conf/neptune-remote.yaml
+
+//Open remote console
+:remote console
+
+
+//Sample queries
+
+g.V()
+g.addV('person').property('name','Riyaz').property(id,'riyaz')
+g.addV('person').property('name','Stephane').property(id,'stephane')
+g.addV('person').property('name','Mark').property(id,'mark')
+g.addV('person').property('name','Ram').property(id,'ram')
+g.addV('person').property('name','Tracy').property(id,'tracy')
+g.addV('food').property('name','Coffee').property(id,'coffee')
+g.addV('food').property('name','Tea').property(id,'tea')
+g.addV('food').property('name','Cookies').property(id,'cookies')
+g.addV('food').property('name','Pizza').property(id,'pizza')
+
+g.V('stephane').addE('friend').to(g.V('riyaz')).property(id, 'edge1')
+g.V('stephane').addE('friend').to(g.V('mark')).property(id, 'edge2')
+g.V('stephane').addE('friend').to(g.V('tracy')).property(id, 'edge3')
+g.V('riyaz').addE('friend').to(g.V('stephane')).property(id, 'edge4')
+g.V('riyaz').addE('friend').to(g.V('ram')).property(id, 'edge5')
+g.V('stephane').addE('likes').to(g.V('coffee')).property(id, 'edge6')
+g.V('riyaz').addE('likes').to(g.V('tea')).property(id, 'edge7')
+g.V('ram').addE('likes').to(g.V('cookies')).property(id, 'edge8')
+g.V('mark').addE('likes').to(g.V('pizza')).property(id, 'edge9')
+g.V('tracy').addE('likes').to(g.V('tea')).property(id, 'edge10')
+
+g.V('riyaz').out('friend')
+g.V('riyaz').out('likes')
+g.V('stephane').out('friend')
+g.V('stephane').out('likes')
+g.V('stephane').out('friend').out('likes')
+g.V('stephane').out('friend').out('likes').dedup()
+g.V('stephane').out('friend').as('friends').out('likes').hasId('tea').select('friends')
+
+
+g.V().drop()
+g.V()
+	

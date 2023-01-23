@@ -1,0 +1,10 @@
+[
+    {
+        "ParameterKey": "TargetRCU",
+        "ParameterValue": "2"
+    },
+    {
+        "ParameterKey": "TargetWCU",
+        "ParameterValue": "1"
+    }
+]

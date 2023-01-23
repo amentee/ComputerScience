@@ -1,0 +1,12 @@
+1. SSH into the VPN server
+2. Install openswan: 
+sudo yum install openswan -y
+3. Open the VPN configuration file you downloaded and follow the instructions in the file to setup Tunnel 1
+4. Make sure you remove auth=esp from the configuration
+5. Make sure you change:
+phase2alg=aes_gcm
+ike=aes256-sha1;modp1024
+6. Start the IPSec service: 
+sudo service ipsec start
+7. Check status of IPSec service: 
+sudo service ipsec status

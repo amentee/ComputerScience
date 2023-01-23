@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  DBAllocatedStorage:
+    Default: '20'
+    Description: The size of the database (GiB)
+    Type: Number
+    MinValue: '20'
+    MaxValue: '1024'
+    ConstraintDescription: must be between 20 and 65536 GiB.
+Resources:
+  MyDB:
+    Type: 'AWS::RDS::DBInstance'
+    Properties:
+      DBInstanceClass: "db.t2.micro"
+      AllocatedStorage: !Ref DBAllocatedStorage
+      Engine: MySQL
+      EngineVersion: 8.0.16
+      MasterUsername: admin
+      MasterUserPassword: secretpassword
+      # protect the database
+      DeletionProtection: true
+      DeleteAutomatedBackups: false
+    # Retain the database after deleting it
+    DeletionPolicy: Retain
+    # could also: DeletionPolicy: Snapshot # (default)
+    # could also: DeletionPolicy: Delete (good for dev)

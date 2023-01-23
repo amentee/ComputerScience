@@ -1,0 +1,79 @@
+----------------------------------------------
+Step 4a – Configure on-premise DNS server
+----------------------------------------------
+1. Login to on-premise DNS server (via SSH into VPN server first)
+
+2. Install DNS server packages
+        $sudo su
+        $yum update –y
+        $yum install bind bind-utils –y
+
+3. Create file /var/named/onprem.com.zone [Replace X.X with your App server IP]
+
+$TTL 86400
+@  
+IN  SOA     ns1.onprem.com. root.onprem.com. (
+2013042201  ;Serial
+3600        ;Refresh
+1800        ;Retry
+604800      ;Expire
+86400       ;Minimum TTL
+)
+; Specify our two nameservers
+IN  NS    dnsA.onprem.com.
+IN  NS    dnsB.onprem.com.
+; Resolve nameserver hostnames to IP, replace with your two droplet IP addresses.
+dnsA   
+IN  A   1.1.1.1
+dnsB   
+IN  A   8.8.8.8
+; Define hostname -> IP pairs which you wish to resolve
+@    
+IN  A   192.168.X.X
+app   IN 
+A   192.168.X.X
+
+4. Create file /etc/named.conf [Replace X.X with your DNS server IP]
+options {
+  directory "/var/named";
+  dump-file "/var/named/data/cache_dump.db";
+  statistics-file "/var/named/data/named_stats.txt";
+  memstatistics-file "/var/named/data/named_mem_stats.txt";
+  allow-query { any; };
+  allow-transfer     { localhost; 192.168.X.X; };
+  recursion yes;
+  forward first;
+  forwarders {
+    192.168.0.2;
+  };
+  dnssec-enable yes;
+  dnssec-validation yes;
+  dnssec-lookaside auto;
+  /* Path to ISC DLV key */
+  bindkeys-file "/etc/named.iscdlv.key";
+  managed-keys-directory "/var/named/dynamic";
+};
+zone "onprem.com" IN {
+    type master;
+    file "onprem.com.zone";
+    allow-update { none; };
+};
+
+5. Restart named service
+$service named restart
+$chkconfig named on
+
+----------------------------------------------
+Step 5b – Configure on-premise DNS server
+----------------------------------------------
+1. Add following to /etc/named.conf. Replace ENDPOINT IPs with Route53 inbound resolver IPs.
+
+zone "cloud.com" { 
+  type forward; 
+  forward only;
+  forwarders { INBOUND_ENDPOINT_IP1; INBOUND_ENDPOINT_IP2; }; 
+};
+
+2. Restart named service
+sudo service named restart
+
